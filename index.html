@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>21</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <link rel="stylesheet" href="css/bootstrap/bootstrap.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="shortcut icon" href="assets/favicon.png" type="image/png">
+
+    <style>
+    </style>
+</head>
+<body>
+    <div class="container text-center" id="app">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="title">Jogo 21 com VueJS</h1>
+            </div>
+            <div :class="['col-6', playerSelected == 1 ? 'active' : '']">
+                <img src="assets/player1.png" alt="Jogador 1">
+                <p>Player 1 <span class="badge badge-default">{{ numberHistoryPlayerOne }}</span></p>
+                <p><strong>Pontos: </strong>{{ playerOne.score }}</p>
+            </div>
+            <div :class="['col-6', playerSelected == 2 ? 'active' : '']">
+                <img src="assets/player2.png" alt="Jogador 2">
+                <p>Player 2 <span class="badge badge-default">{{ playerTwo.historic.length }}</span></p>
+                <p><strong>Pontos: </strong>{{ playerTwo.score }}</p>
+            </div>
+            <div class="controls col">
+                <a href="#" class="btn btn-success" @click.prevent="changePlayer">Pular</a>
+                <a href="#" class="btn btn-primary" @click.prevent="finishGame">Finalizar</a>
+                <a href="#" class="btn btn-danger" @click.prevent="resetGame">Resetar</a>
+
+            </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    <a href="#" @click.prevent="selectedCard">
+                        <img src="assets/baralho-cartas.png" alt="Baralho" class="carts">
+                    </a>
+                </div>
+                <div class="col-6">
+                    <div  v-if="cartSelected != ''">
+                        <img :src="'assets/carts/' + cartSelected + '.png'" :alt="cartSelected" class="cart">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./vue.js"></script>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data : {
+                cartSelected: '',
+                playerSelected : 1,
+                playerOne: {
+                    score: 0,
+                    historic: [],
+                },
+                playerTwo: {
+                    score: 0,
+                    historic: [],
+                },
+            },
+
+            watch: {
+            },
+            computed: {
+                numberHistoryPlayerOne: function(){
+                    return this.playerOne.historic.length
+                },
+                numberHistoryPlayerTwo: function(){
+                    return this.playerTwo.historic.length
+                },
+            },
+
+            methods: {
+               changePlayer: function(){
+                   this.playerSelected = this.playerSelected == 1 ? 2 : 1
+                   this.cartSelected = ''
+               },
+
+               selectedCard: function(){
+                    let cart = Math.floor((Math.random() * 13) + 1)
+                    console.log(cart)
+                    this.cartSelected = cart
+                    
+                    if(this.playerSelected == 1){
+                        this.playerOne.score += this.cartSelected
+                        this.playerOne.historic.push(this.cartSelected)
+                    }
+                    else{
+                        this.playerTwo.score += this.cartSelected
+                        this.playerTwo.historic.push(this.cartSelected)
+                    }
+
+                    if(this.playerOne.score >= 21 || this.playerTwo.score >= 21)
+                        this.finishGame()
+               },
+               finishGame: function(){
+                    if(this.playerOne.score <= 21 && this.playerOne.score > this.playerTwo.score)
+                        alert("Player 1 venceu o jogo")
+                    else if(this.playerTwo.score <= 21 && this.playerTwo.score > this.playerOne.score)
+                        alert("Player 2 venceu o jogo")
+                    else if(this.playerOne.score > 21 && this.playerTwo.score <= 21)
+                        alert("Player 2 venceu o jogo")
+                    else if(this.playerTwo.score > 21 && this.playerOne.score <= 21)
+                        alert("Player 1 venceu o jogo")
+                    else
+                    alert("Jogo empatado")
+
+                    let vm = this
+
+                    setTimeout(function(){
+                        vm.resetGame()
+                    }, 3000)
+               },
+
+               resetGame: function(){
+                   this.playerOne.score = 0
+                   this.playerTwo.score = 0
+                   this.cartSelected = ''
+                   this.playerSelected = 1
+               },
+            },
+
+        });
+    </script>
+</body>
+</html>
